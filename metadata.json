@@ -1,0 +1,7 @@
+{
+  "name": "Explore India — Discover India's Famous & Hidden Destinations",
+  "description": "Explore India - Discover India's famous and hidden destinations. A premium tourism and local heritage information system.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
