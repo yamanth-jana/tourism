@@ -2,17 +2,6 @@
 
 USE explore_india;
 
--- Default Administrator (password: admin123, BCrypt hashed)
--- BCrypt hash for 'admin123' is '$2a$10$wE99w/6fX2/Z/3Zz6iM27eWw6vH4qQ0e6bBf4bB1w/wQ7bBf4bB1w'
-INSERT INTO users (email, password_hash, full_name, role, status)
-SELECT 'admin@exploreindia.com', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG', 'Administrator', 'ADMIN', 'ACTIVE'
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@exploreindia.com');
-
--- Default User (password: user123, BCrypt hashed)
-INSERT INTO users (email, password_hash, full_name, role, status)
-SELECT 'user@exploreindia.com', '$2a$10$vI8aWBnW3fK/sW7P50lGme.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG', 'Aarav Sharma', 'USER', 'ACTIVE'
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'user@exploreindia.com');
-
 -- Core Categories
 INSERT INTO categories (id, name, slug, icon, description)
 SELECT 'heritage', 'Heritage & Monuments', 'heritage', 'Landmark', 'Historical monuments, palaces, forts and architectural wonders'
