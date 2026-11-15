@@ -9,6 +9,8 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
@@ -37,11 +39,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Authentication provider
     @Bean
     public AuthenticationProvider authenticationProvider(
             CustomUserDetailsService userDetailsService) {
@@ -66,8 +70,14 @@ public class SecurityConfig {
         );
 
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "PATCH",
-                        "DELETE", "OPTIONS")
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "OPTIONS"
+                )
         );
 
         configuration.setAllowedHeaders(List.of("*"));
@@ -81,6 +91,7 @@ public class SecurityConfig {
         return source;
     }
 
+    // Spring Security configuration
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -89,40 +100,63 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+
             .cors(cors -> cors.configurationSource(
                     corsConfigurationSource()
             ))
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
+                        SessionCreationPolicy.STATELESS
                 )
             )
+
             .authorizeHttpRequests(auth -> auth
 
+                // Allow CORS preflight requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // Swagger endpoints
                 .requestMatchers(
-                    "/api-docs",
-                    "/api-docs/**",
-                    "/swagger-ui.html",
-                    "/swagger-ui/**"
+                        "/api-docs",
+                        "/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**"
                 ).permitAll()
 
+                // Authentication endpoints
                 .requestMatchers("/api/auth/**").permitAll()
 
+                // Public GET endpoints
                 .requestMatchers(
-                    "/api/places/**",
-                    "/api/states/**",
-                    "/api/districts/**",
-                    "/api/categories/**",
-                    "/api/search/**",
-                    "/api/reviews/**",
-                    "/api/guides/**",
-                    "/api/contact/**",
-                    "/api/newsletter/**",
-                    "/api/health"
+                        HttpMethod.GET,
+                        "/api/places/**",
+                        "/api/states/**",
+                        "/api/districts/**",
+                        "/api/categories/**",
+                        "/api/search/**",
+                        "/api/reviews/**",
+                        "/api/guides/**",
+                        "/api/health"
                 ).permitAll()
 
+                // Public contact and newsletter endpoints
+                .requestMatchers(
+                        "/api/contact/**",
+                        "/api/newsletter/**"
+                ).permitAll()
+
+                // User-specific endpoints require authentication
+                .requestMatchers(
+                        "/api/favorites/**",
+                        "/api/notifications/**",
+                        "/api/guide-registrations/**"
+                ).authenticated()
+
+                // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
+                // All remaining endpoints require authentication
                 .anyRequest().authenticated()
             );
 
