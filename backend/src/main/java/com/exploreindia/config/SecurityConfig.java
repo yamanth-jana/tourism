@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -30,25 +29,16 @@ public class SecurityConfig {
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter) {
-
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-
-    // =========================================================
     // PASSWORD ENCODER
-    // =========================================================
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
-    // =========================================================
     // AUTHENTICATION PROVIDER
-    // =========================================================
-
     @Bean
     public AuthenticationProvider authenticationProvider(
             CustomUserDetailsService userDetailsService) {
@@ -62,11 +52,7 @@ public class SecurityConfig {
         return provider;
     }
 
-
-    // =========================================================
     // SECURITY FILTER CHAIN
-    // =========================================================
-
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -110,22 +96,26 @@ public class SecurityConfig {
                     "/api/admin/**"
                 ).hasRole("ADMIN")
 
-                // Everything else requires authentication
-                .anyRequest()
-                .authenticated()
-            );
+                // Swagger / OpenAPI documentation
+                .requestMatchers(
+                    "/api-docs",
+                    "/api-docs/**",
+                    "/swagger-ui.html",
+                    "/swagger-ui/**"
+                ).permitAll()
 
+                // Other endpoints require authentication
+                .anyRequest().authenticated()
+            );
 
         // Authentication provider
         http.authenticationProvider(authenticationProvider);
-
 
         // JWT authentication filter
         http.addFilterBefore(
             jwtAuthenticationFilter,
             UsernamePasswordAuthenticationFilter.class
         );
-
 
         return http.build();
     }
