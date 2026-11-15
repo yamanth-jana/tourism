@@ -62,7 +62,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("https://tourism-cyan-six.vercel.app")
+                List.of("https://tourism-ycdm.vercel.app")
         );
 
         configuration.setAllowedMethods(
